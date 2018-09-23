@@ -1,0 +1,79 @@
+//初期化
+#define CRLF_SIZE  2
+
+color 245,245,245
+boxf 0,0,1000,1000
+color 0,0,0
+
+//変数
+tja_file_pass=""
+notesel tja_file
+
+//プログラム開始===============================================================================
+
+*start
+	//ボタン[tjaファイルを開く]
+		pos 9,12
+		objsize 85, 25
+			button"tjaファイルを開く",*select_tja
+
+	//[tjaファイルを開く]のinputボックス
+		pos 98,14
+			input tja_file_pass, 520, 21,1000
+
+	//処理開始ボタン
+		objsize 85, 25
+		pos 9,40
+		button "処理開始",*start_cat
+
+stop
+//tjaファイルの選択処理
+	*select_tja
+		dialog "tja", 16, "tjaファイル"
+			if stat = 0 {
+				goto *start
+		}
+		tja_file_pass=refstr 
+		objprm 1,tja_file_pass
+stop
+
+*start_cat
+
+//tjaファイル切り分け処理
+	//tjaファイルを開く
+		notesel tja_file
+		noteload tja_file_pass
+
+tx  = tja_file
+
+// 事前準備
+notesel tx
+max = notemax
+noteunsel
+dim txSixe, max
+nowIndex = 0
+repeat max
+	index = instr( tx, nowIndex, "\n" )
+	if ( index != -1 ) {
+		nowIndex += index + CRLF_SIZE
+		txSixe.cnt = nowIndex
+	} else {
+		txSixe.cnt = strlen( tx )
+		break
+	}
+	await
+loop
+
+target = "COURSE:Oni"
+targetIndex = instr( tx, 0, target )
+
+if ( targetIndex != -1 ) {
+	// 行数チェック
+	repeat max
+		if ( targetIndex < txSixe.cnt ) {
+			count = cnt
+			break
+		}
+	loop
+	mes "「" + target + "」は" + str( count ) + "行目"
+}
