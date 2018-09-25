@@ -9,7 +9,7 @@ color 0,0,0
 tja_file_pass=""
 notesel tja_file
 
-//プログラム開始===============================================================================
+//プログラム開始
 
 *start
 	//ボタン[tjaファイルを開く]
@@ -44,36 +44,59 @@ stop
 		notesel tja_file
 		noteload tja_file_pass
 
-tx  = tja_file
+	tx  = tja_file
 
-// 事前準備
-notesel tx
-max = notemax
-noteunsel
-dim txSixe, max
-nowIndex = 0
-repeat max
-	index = instr( tx, nowIndex, "\n" )
-	if ( index != -1 ) {
-		nowIndex += index + CRLF_SIZE
-		txSixe.cnt = nowIndex
-	} else {
-		txSixe.cnt = strlen( tx )
-		break
-	}
-	await
-loop
+	//tja難易度検索事前準備
+		notesel tx
+		max = notemax
+		noteunsel
+		dim txSixe, max
+		nowIndex = 0
+		repeat max
+			index = instr( tx, nowIndex, "\n" )
+			if ( index != -1 ) {
+				nowIndex += index + CRLF_SIZE
+				txSixe.cnt = nowIndex
+			} else {
+				txSixe.cnt = strlen( tx )
+				break
+			}
+			await
+		loop
 
-target = "COURSE:Oni"
-targetIndex = instr( tx, 0, target )
+		target = "COURSE"
+		targetIndex = instr( tx, 0, target )
 
-if ( targetIndex != -1 ) {
-	// 行数チェック
-	repeat max
-		if ( targetIndex < txSixe.cnt ) {
-			count = cnt
-			break
+		if ( targetIndex != -1 ) {
+			// 行数チェック
+			repeat max
+				if ( targetIndex < txSixe.cnt ) {
+					count = cnt
+					break
+				}
+			loop
+			mes "「" + target + "」は" + str( count ) + "行目"
 		}
-	loop
-	mes "「" + target + "」は" + str( count ) + "行目"
-}
+
+	line_count_to_level = str (count)
+
+
+	loaded_what_row_first=0
+
+	*read_definition
+	//	if loaded_what_row_first != line_count_to_level  {
+
+			noteget first_definition,loaded_what_row_first
+			loaded_what_row_first + 1
+
+
+				//if loaded_what_row_first != line_count_to_level  {
+					if loaded_what_row_first != 1  {
+					goto *read_definition 
+				}
+		//}
+
+mes first_definition
+
+
+//バグ first_definitionに一行分しか保存できない これでは初期定義が保存できない
